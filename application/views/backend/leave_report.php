@@ -1,0 +1,144 @@
+<?php $this->load->view('backend/header'); ?>
+<?php $this->load->view('backend/sidebar'); ?>
+<?php $id = $this->session->userdata('user_login_id');
+      $basicinfo = $this->employee_model->GetBasic($id); ?>
+<style>
+@media print {
+    .non-printable, .fancybox-outer { display: none; }
+    .printable, #printDiv { 
+        display: block; 
+        font-size: 26pt;
+    }
+  }
+</style>
+<div class="page-wrapper">
+    <div class="message"></div>
+    <div class="row page-titles">
+        <div class="col-md-5 align-self-center">
+            <h3 class="text-themecolor"><i class="fa fa-fax" style="color:maroon"> </i> Leave Report</h3>
+        </div>
+        <div class="col-md-7 align-self-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+                <li class="breadcrumb-item active">Leave Report</li>
+            </ol>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-outline-info">
+                    <div class="card-header">
+                        <h4 class="fa fa-fax"> Report List</h4>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form method="post" action="" id="salaryform" class="form-material row">
+                                        <div class="form-group col-md-3">
+                                            <input type="text" name="datetime" id="date_from" class="form-control mydatetimepicker" placeholder="from" required>
+                                        </div>
+                                        
+                                        <div class="form-group col-md-3">
+                                            <select class="select2 form-control custom-select col-md-8" data-placeholder="Choose a Category" tabindex="1" id="emid" name="emid" required>
+                                                <option value="#">Select Here</option>
+                                                <option value="all">All Employee</option>
+                                                <?php foreach($employee as $value): ?>
+                                                <option value="<?php echo $value->em_id ?>">
+                                                    <?php echo $value->first_name.' '.$value->last_name; ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <input type="submit" class="btn btn-success" value="Submit" name="submit" id="BtnSubmit">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+					<input name="b_print" type="button" class="btn btn-info print_leave_btn" value=" Print ">
+                        <div id="div_print" class="table-responsive print_leave">
+							 
+                            <table id="example234" class="display nowrap table table-hover table-striped table-bordered datatable" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>PIN</th>
+                                        <th>Employee</th>
+                                        <th>Leave Type</th>
+                                        <th>Duration</th>
+                                        <th>Start</th>
+                                        <th>End</th>
+                                        <th>Leave Status</th>
+                                        <!--<th>Total</th>-->
+                                   </tr>
+                                </thead>
+								<!--<tbody>
+                                <?php //foreach($leavetypes as $value): ?>
+								<td><?php //echo $value->em_id; ?></td>
+								 <td><?php //echo $value->first_name.' '.$value->last_name; ?></td>
+								 <td><?php //echo $value->leave_type; ?></td>
+								 <td><?php //echo $value->leave_duration; ?></td>
+								 <td><?php //echo $value->start_date; ?></td>
+								 <td><?php //echo $value->end_date; ?></td>
+                                 <td><?php echo $value->leave_status; ?></td>
+								<?php //endforeach; ?>
+								</tbody>-->
+                                <tbody style="color:maroon" class="leave" >
+
+                                </tbody> 
+                            </table>
+							<div class="gby">Generated by:<p style="text-decoration:underline;"><?php echo $basicinfo->first_name." ".$basicinfo->last_name; ?></p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function() {
+				 $('.print_leave_btn').hide();
+				  $('.gby').hide();
+                $("#BtnSubmit").on("click", function(event) {
+
+                    event.preventDefault();
+
+                    var emid = $('#emid').val();
+                    var datetime = $('.mydatetimepicker').val();
+                    console.log(datetime);
+                    $.ajax({
+                        url: "Get_LeaveDetails?date_time=" + datetime + "&emp_id=" + emid,
+                        type: "GET",
+                        data: 'data',
+                        success: function(response) {
+                            $('.leave').html(response);
+							$('.print_leave_btn').show();
+							$('.gby').show();
+                        }
+                    });
+                });
+            });
+			
+			
+		
+       
+ 
+        </script>
+        <?php $this->load->view('backend/footer'); ?>
+		<script src="<?php echo base_url(); ?>assets/js/jquery.PrintArea.js" type="text/JavaScript"></script>
+		<script>
+			$(document).ready(function() {
+				$(".print_leave_btn").click(function() {
+					console.log('sfsdfs');
+					var mode = 'iframe'; //popup
+					var close = mode == "popup";
+					var options = {
+						mode: mode,
+						popClose: close
+					};
+					$("div.print_leave").printArea(options);
+				});
+			});
+		</script>
